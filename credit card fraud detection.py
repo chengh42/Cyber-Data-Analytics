@@ -25,7 +25,6 @@ import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
 from scipy import interp
 from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import make_pipeline
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from collections import Counter
@@ -36,6 +35,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 
 #sns.set(style='whitegrid')
 
@@ -143,65 +143,53 @@ plt.savefig('Scattermap_CountryVsAmount_all.png')
 ##Imbalanced data: standard vs SMOTE
 '''
 
-class DummySampler(object):
-    def sample(self, X, y):
-        return X, y
-
-    def fit(self, X, y):
-        return self
-
-    def fit_resample(self, X, y):
-        return self.sample(X, y)
-
-
 # settings
-cv = StratifiedKFold(10)
+cv = StratifiedKFold(5, random_state = 42)
 classifiers = [
-    ['NN-MLP', MLPClassifier()],
-    ['DecisionTree', DecisionTreeClassifier()],
-    ['RandomForest', RandomForestClassifier(n_estimators=10)]
+    ['LogisticRegression', LogisticRegression(random_state = 42)],
+    ['NN-MLP', MLPClassifier(random_state = 42)],
+    ['DecisionTree', DecisionTreeClassifier(random_state = 42)],
+    ['RandomForest', RandomForestClassifier(n_estimators=10, random_state = 42)]
 ]
-samplers = [
-    ['Standard', DummySampler()],
-    ['SMOTE', SMOTE(random_state=42)]
-]
-pipelines = [
-    ['{}-{}'.format(classifier[0], sampler[0]),
-     make_pipeline(sampler[1], classifier[1])]
-    for classifier in classifiers
-    for sampler in samplers
+data_sampling = [
+    ['Standard', x, y],
+    ['SMOTE', x_res, y_res]
 ]
 
 # loop and plot
 fig = plt.figure(4, figsize=(8, 8))
 
 # for specific classifier & sampler
-for name, pipeline in pipelines:
-    # print(name)
-    i = 1
-    mean_tpr = 0.0  # initial dummy true positive rate
-    mean_fpr = np.linspace(0, 1, 100)  # initial dummy false positive rate
-
-    # for n-folds cross validations
-    for train, test in cv.split(x, y):
-        print('%s - cv #%i' % (name, i))
-        clf = pipeline.fit(x[train], y[train])  # train/fit the model
-        y_ = clf.predict(x[test])  # predict *y_* using x[test]
-        # Compute ROC curve and area the curve
-        fpr, tpr, thresholds = roc_curve(y[test], y_)
-        mean_tpr += interp(mean_fpr, fpr, tpr)
-        mean_tpr[0] = 0.0
-        roc_auc = auc(fpr, tpr)
-        i += 1
-    # calculate the means for n-folds cv's
-    mean_tpr /= cv.get_n_splits(x, y)
-    mean_tpr[-1] = 1.0
-    mean_auc = auc(mean_fpr, mean_tpr)
-    # print output message    
-    print('%s (auc = %f)\n' % (name, mean_auc))
-    # plot ROC curve
-    plt.plot(mean_fpr, mean_tpr, linestyle='--', lw=2,
-             label='{} (area = %0.2f)'.format(name) % mean_auc)
+for classifier in classifiers:
+    for sampled_data in data_sampling:
+        i = 1
+        name = '{}-{}'.format(classifier[0], sampled_data[0])
+        sx = sampled_data[1]
+        sy = sampled_data[2]
+        clf = classifier[1]
+        print(name)
+        
+        mean_tpr = 0.0  # initial dummy true positive rate
+        mean_fpr = np.linspace(0, 1, 100)  # initial dummy false positive rate
+        # for n-folds cross validations
+        for train, test in cv.split(sx, sy):
+            print('%s - cv #%i' % (name, i))
+            y_ = clf.fit(sx[train], sy[train]).predict(sx[test])  # train/fit the model
+                                            # predict *y_* using x[test]
+            # Compute ROC curve and area the curve
+            fpr, tpr, thresholds = roc_curve(sy[test], y_)
+            mean_tpr += interp(mean_fpr, fpr, tpr)
+            mean_tpr[0] = 0.0
+            roc_auc = auc(fpr, tpr)
+            i += 1
+        # calculate the means for n-folds cv's
+        mean_tpr /= cv.get_n_splits(sx, sy)
+        mean_tpr[-1] = 1.0
+        mean_auc = auc(mean_fpr, mean_tpr)
+        print('{} (auc = %f)\n'.format(name) % (mean_auc))
+        # plot ROC curve
+        plt.plot(mean_fpr, mean_tpr, linestyle='--', lw=2,
+                label='{} (area = %0.2f)'.format(name) % mean_auc)
 
 plt.xlim([-0.05, 1.05])
 plt.ylim([-0.05, 1.05])
@@ -209,7 +197,7 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
 plt.legend(loc="lower right")
-plt.savefig('ROC Imbalanced data 4.png')
+plt.savefig('ROC Imbalanced data 6.png')
 
 
 # %%
