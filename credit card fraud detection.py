@@ -28,6 +28,7 @@ from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import make_pipeline
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 from sklearn.model_selection import StratifiedKFold, cross_val_score
+from collections import Counter
 
 # classifiers
 from sklearn.svm import LinearSVC, SVC
@@ -41,7 +42,7 @@ from sklearn.ensemble import RandomForestClassifier
 # %%
 
 '''
-data preparation
+##data preparation
 '''
 
 # load dataset
@@ -95,16 +96,18 @@ df.info()
 df.sample(5)
 
 ## Features & Labels
+y = df.simple_journal.values  # labels
+x = df.drop(columns=['simple_journal', 'bookingdate']).values  # features
 
-y = df.simple_journal  # labels
-x = df.drop(columns=['simple_journal', 'bookingdate'])  # features
-
+## Resampling using SMOTE
+x_res, y_res = SMOTE(random_state=42).fit_resample(x, y)  # get SMOTEd data
+Counter(y), Counter(y_res) #check resampled results
 
 # %%
 
 '''
-Task 1
-Visualisation
+##Task 1
+##Visualisation
 '''
 
 # Visualisation : Heatmap, number of frauds, per country & amount of transactions
@@ -136,8 +139,8 @@ plt.savefig('Scattermap_CountryVsAmount_all.png')
 # %%
 
 '''
-Task 2
-Imbalanced data: standard vs SMOTE
+##Task 2
+##Imbalanced data: standard vs SMOTE
 '''
 
 class DummySampler(object):
@@ -160,7 +163,7 @@ classifiers = [
 ]
 samplers = [
     ['Standard', DummySampler()],
-    ['SMOTE', SMOTE(random_state=42)],
+    ['SMOTE', SMOTE(random_state=42)]
 ]
 pipelines = [
     ['{}-{}'.format(classifier[0], sampler[0]),
@@ -169,10 +172,8 @@ pipelines = [
     for sampler in samplers
 ]
 
-
 # loop and plot
 fig = plt.figure(4, figsize=(8, 8))
-# ax = fig.add_subplot(1, 1, 1)
 
 # for specific classifier & sampler
 for name, pipeline in pipelines:
@@ -181,13 +182,13 @@ for name, pipeline in pipelines:
     mean_tpr = 0.0  # initial dummy true positive rate
     mean_fpr = np.linspace(0, 1, 100)  # initial dummy false positive rate
 
-    # for n-th folds cross validations
+    # for n-folds cross validations
     for train, test in cv.split(x, y):
         print('%s - cv #%i' % (name, i))
-        clf = pipeline.fit(x.iloc[train], y.iloc[train])  # train/fit the model
-        y_ = clf.predict(x.iloc[test])  # predict *y_* using x[test]
+        clf = pipeline.fit(x[train], y[train])  # train/fit the model
+        y_ = clf.predict(x[test])  # predict *y_* using x[test]
         # Compute ROC curve and area the curve
-        fpr, tpr, thresholds = roc_curve(y.iloc[test], y_)
+        fpr, tpr, thresholds = roc_curve(y[test], y_)
         mean_tpr += interp(mean_fpr, fpr, tpr)
         mean_tpr[0] = 0.0
         roc_auc = auc(fpr, tpr)
@@ -197,7 +198,7 @@ for name, pipeline in pipelines:
     mean_tpr[-1] = 1.0
     mean_auc = auc(mean_fpr, mean_tpr)
     # print output message    
-    print('%s (auc = %f)' % (name, mean_auc))
+    print('%s (auc = %f)\n' % (name, mean_auc))
     # plot ROC curve
     plt.plot(mean_fpr, mean_tpr, linestyle='--', lw=2,
              label='{} (area = %0.2f)'.format(name) % mean_auc)
@@ -208,18 +209,20 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
 plt.legend(loc="lower right")
-plt.savefig('ROC Imbalanced data 3.png')
+plt.savefig('ROC Imbalanced data 4.png')
 
 
 # %%
 
 '''
-Task 3-1
-Classification : Blackbox
+##Task 3-1
+##Classification : Blackbox
 '''
 
 cv = StratifiedKFold(10)
 x_res, y_res = SMOTE(random_state=42).fit_resample(x, y)  # get SMOTEd data
+
+Counter(y), Counter(y_res) #check resampled results
 
 models = [
     ['NN-MLP', MLPClassifier()],
@@ -230,7 +233,35 @@ results = []
 names = []
 for name, model in models:
     cv_results = cross_val_score(
-        model, x_res, y_res, cv=cv, scoring='roc_auc')
+        model, x_res, y_res, cv = cv, scoring = 'roc_auc')
+    results.append(cv_results)
+    names.append(name)
+    print('%s: %f (%f)' % (name, cv_results.mean(), cv_results.std()))
+
+# Compare between classifiers
+plt.figure(5, figsize=(6, 6))
+plt.boxplot(results, labels = names)
+plt.title('Comparison of Classification Algorithms')
+plt.xlabel('Algorithm')
+plt.ylabel('ROC-AUC Score')
+plt.savefig('Comparison Classification -b.png')
+
+# %%
+
+'''
+##Task 3-2
+##Classification : Whitebox
+'''
+
+models = [
+    ['DecisionTree', DecisionTreeClassifier()]
+]
+
+results = []
+names = []
+for name, model in models:
+    cv_results = cross_val_score(
+        model, x_res, y_res, cv = cv, scoring = 'roc_auc')
     results.append(cv_results)
     names.append(name)
     print('%s: %f (%f)' % (name, cv_results.mean(), cv_results.std()))
@@ -242,4 +273,4 @@ plt.title('Comparison of Classification Algorithms')
 plt.xlabel('Algorithm')
 plt.ylabel('ROC-AUC Score')
 plt.set_xticklabels(names)
-plt.savefig('Comparison Classification.png')
+plt.savefig('Comparison Classification -w.png')
