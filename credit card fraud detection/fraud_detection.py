@@ -184,8 +184,8 @@ plt.savefig('Scattermap_CountryVsAmount_all.png')
 cv = StratifiedKFold(n_splits = 5, random_state = seed)
 classifiers = [
     ['LogisticRegression', LogisticRegression(random_state = seed, solver = 'lbfgs', n_jobs = -1)],
-    ['NN-MLP', MLPClassifier(random_state = seed, n_jobs = -1)],
-    ['DecisionTree', DecisionTreeClassifier(random_state = seed, n_jobs = -1)],
+    ['NN-MLP', MLPClassifier(random_state = seed)],
+    ['DecisionTree', DecisionTreeClassifier(random_state = seed)],
     ['RandomForest', RandomForestClassifier(n_estimators = 10, random_state = seed, n_jobs = -1)]
 ]
 data = [x, y]
