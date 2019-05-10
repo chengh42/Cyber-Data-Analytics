@@ -18,7 +18,7 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score, cross_val_
 from sklearn.metrics import roc_curve, auc, confusion_matrix, precision_recall_curve
 from imblearn.over_sampling import SMOTE
 from scipy import interp
-from sklearn.preprocessing import LabelEncoder, label_binarize
+from sklearn.preprocessing import LabelEncoder, label_binarize, StandardScaler
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -60,7 +60,7 @@ def plot_roc_curve( classifiers, data, cv, title = 'ROC Curve',
 
         # for n-folds cross validations
         for train, test in cv.split(x, y):
-            print('%s - cv #%i' % (name, i))            
+            print('%s - cv #%i' % (name, i))
             x_res, y_res = SMOTE(n_jobs = -1, random_state= seed).fit_resample(x[train], y[train]) # SMOTE'd data
             y_pred = clf.fit(x_res, y_res).predict(x[test]) # train/fit the model & predict y_ using x[test]
             # Compute ROC curve and auc
@@ -113,4 +113,3 @@ def plot_roc_curve( classifiers, data, cv, title = 'ROC Curve',
     plt.savefig(filename)
 
 
-# if __name__ == "__main__":
