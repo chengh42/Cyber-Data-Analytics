@@ -3,17 +3,8 @@
 # # Credit Card  Fraud Detection Lab!
 # 
 
-#%% Change working directory from the workspace root to the .py file location
-import os
-try:
-	os.chdir(os.path.dirname(os.path.realpath('__file__')))
-	print(os.getcwd())
-except:
-	pass
-
 # %%
 
-get_ipython().magic(u'matplotlib inline')
 import time
 import datetime
 import matplotlib
@@ -45,6 +36,11 @@ from fraud_detection_functions import * #load functions
 
 from warnings import simplefilter # import warnings filter
 simplefilter(action = 'ignore', category = FutureWarning) # ignore all future warnings
+
+sns.set_style(style = 'whitegrid') #set graph style
+
+
+
 
 # %% [markdown]
 # 
@@ -142,12 +138,9 @@ feature_names = df.drop(columns = ['simple_journal', 'bookingdate']).columns.val
 #
 # %%
 
-sns.set(style = 'whitegrid') #set graph style
-
 # get a subset of df which contains 1/4 fraud and 3/4 benign
 df_a = df.loc[df.simple_journal == 1]
 df_a = pd.concat([df_a, df.loc[df.simple_journal == 0].sample(n = len(df_a)*3)])
-df_a.drop(columns = 'creditcard_frequency', inplace = True) #drop creditcard frequency
 df_a.sort_values('simple_journal', inplace = True)
 df_a.info()
 
@@ -160,7 +153,7 @@ plt.figure(figsize=(15, 15))
 sns.clustermap(df_a.drop(columns = ['simple_journal']), row_colors = row_colors,
                standard_scale = 1, row_cluster=False, col_cluster=False, yticklabels = False) 
 plt.title('Label (standardised)')
-plt.savefig('df_a.png')
+plt.savefig('.\image\df_a.png')
 
 # %%
 
@@ -178,8 +171,6 @@ feature_names_sub = ['issuercountrycode', 'amount', 'cvcresponsecode', 'accountc
 # 
 # %%
 
-sns.set(style = 'whitegrid') #set graph style
-
 # settings
 cv = StratifiedKFold(n_splits = 5, random_state = seed)
 classifiers = [
@@ -191,8 +182,9 @@ classifiers = [
 data = [x, y]
 
 # plot roc curve
-plot_roc_curve(classifiers, data, cv, title = "ROC curve: SMOTE'd vs non-SMOTE'd",
-               filename = 'ROC Imbalanced data.png', OnlySMOTEd = False)
+plot_roc_curve(classifiers, data, cv, 
+               title = "ROC curve: SMOTE'd vs non-SMOTE'd",
+               filename = '.\image\ROC Imbalanced data.png', OnlySMOTEd = False)
 
 # %% [markdown]
 # 
@@ -213,8 +205,6 @@ plot_roc_curve(classifiers, data, cv, title = "ROC curve: SMOTE'd vs non-SMOTE'd
 
 # %%
 
-sns.set(style = 'whitegrid') #set graph style
-
 # settings
 rs = ShuffleSplit(n_splits = 10, test_size = 0.1, random_state = seed)
 list_clf = [
@@ -232,11 +222,11 @@ data_sub = [x_sub, y_sub]
 
 # plot roc curve for blackbox algoritms
 plot_roc_curve(classifiers, data, rs, title = 'ROC curve: blackbox classifiers',
-               filename = 'ROC curve Blackbox.png')
+               filename = '.\image\ROC curve Blackbox.png')
 
 # plot roc curve for df w/ subseted features
 plot_roc_curve(classifiers, data_sub, rs, title = 'ROC curve: blackbox classifiers - subseted features',
-               filename = 'ROC curve Blackbox sub.png')
+               filename = '.\image\ROC curve Blackbox sub.png')
 
 # %% [markdown]
 # 
@@ -244,8 +234,6 @@ plot_roc_curve(classifiers, data_sub, rs, title = 'ROC curve: blackbox classifie
 # 
 
 # %%
-
-sns.set(style = 'whitegrid') #set graph style
 
 # settings
 rs = ShuffleSplit(n_splits = 10, test_size = 0.1, random_state = seed)
@@ -259,12 +247,14 @@ data = [x, y]
 data_sub = [x_sub, y_sub]
 
 # plot roc curve for whitebox algoritms
-plot_roc_curve(classifiers, data, rs, title = 'ROC curve: whitebox classifiers',
-               filename = 'ROC curve Whitebox.png')
+plot_roc_curve(classifiers, data, rs, 
+               title = 'ROC curve: whitebox classifiers',
+               filename = '.\image\ROC curve Whitebox.png')
 
 # plot roc curve for whitebox algoritms w/ subseted features
-plot_roc_curve(classifiers, data_sub, rs, title = 'ROC curve: whitebox classifiers w/ subseted features',
-               filename = 'ROC curve Whitebox sub.png')
+plot_roc_curve(classifiers, data_sub, rs, 
+               title = 'ROC curve: whitebox classifiers w/ subseted features',
+               filename = '.\image\ROC curve Whitebox sub.png')
 
 # %%
 
@@ -277,5 +267,6 @@ classifiers = [
 ]
 
 # plot roc curve for Lasso algoritms
-plot_roc_curve(classifiers, data, rs, title = 'ROC curve: Lasso classifiers',
-               filename = 'ROC curve Whitebox Lasso.png')
+plot_roc_curve(classifiers, data, rs, 
+               title = 'ROC curve: Lasso classifiers',
+               filename = '.\image\ROC curve Whitebox Lasso.png')
