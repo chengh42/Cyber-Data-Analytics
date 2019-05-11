@@ -2,6 +2,8 @@
 
 The coursework aims at incorporating data pre-/post-processing for imbalanced data to improve the performance of predictive models for credict card fraud detection. This study evaluates a few machine learning algorithms and compare the results among SMOTE'd and un-SMOTE'd data.
 
+Author: H. Cheng & P. de Biase
+
 ## Visualisation
 
 ### Heatmap showing features of benign (sampled) vs. frauded data ###
