@@ -260,15 +260,16 @@ for groupnr, groupdf in dftrain2[dftrain2.ATT_FLAG == 1].groupby(partitions):
     modifyDATETIME = groupdf.DATETIME.apply(lambda t: timestamp_to_date(t))
     groupdf.loc[:, 'DATETIME'] = modifyDATETIME.to_numpy()
     start_time = groupdf.loc[partitions == groupnr, 'DATETIME'].values[0]
+    end_time = groupdf.loc[partitions == groupnr, 'DATETIME'].values[-1]
     # merge the data of same datetime (in different year though) from training datset #1
     comparedf = pd.merge(groupdf[['DATETIME', L_var]],
                          cpdftrain1[['DATETIME', L_var]],
                          how = 'left', on = 'DATETIME', suffixes=('_att', '_normal'))
     # plot
     plt.plot(comparedf.drop(columns = 'DATETIME'))
-    plt.title('Water level %s values normal vs under-attack' % L_var)
+    plt.title('Water level %s : normal vs under-attack' % L_var)
     plt.legend(('under attack', 'normal'), loc = 'lower right')
-    plt.xlabel('Hour from %shr' % start_time)
+    plt.xlabel('Hour: from %shr to %shr' % (start_time, end_time))
     plt.ylabel('Water level of tank #%s [meter]' % L_var.partition('_')[2])
     plt.savefig('.\image\comparison\%s-%s.png' % (L_var, start_time), 
                 bbox_inches = 'tight', facecolor = 'w')
