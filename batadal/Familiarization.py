@@ -29,6 +29,10 @@ from multiprocessing import Pool
 
 # %%
 
+#If necessary, change your working directory
+#import os
+#os. chdir("C:/Users/pvbia/Documents/GitHub/Cyber-Data-Analytics/batadal")
+
 # Load dataset
 dftrain1 = pd.read_csv('./data/BATADAL_dataset03.csv')
 
@@ -66,8 +70,6 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.25, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Tank water level [meter]')
-    plt.savefig('.\image\df1\Familiarization_LTanks_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
 
 # %%
 
@@ -79,8 +81,6 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.3, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Pressure [meter]')
-    plt.savefig('.\image\df1\Familiarization_PressureNodes_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
 
 # %%
 
@@ -92,8 +92,6 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.3, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Flowrate [L/s]')
-    plt.savefig('.\image\df1\Familiarization_Flowrate_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
 
 # %%
 
@@ -105,8 +103,6 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.3, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Setting (dmnl)')
-    plt.savefig('.\image\df1\Familiarization_Setting_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
 
 # %% [markdown]
 # 
@@ -364,8 +360,7 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.25, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Tank water level [meter]')
-    plt.savefig('.\image\df2\Familiarization_df2_LTanks_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
+
 
 # %%
 
@@ -377,8 +372,7 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.3, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Pressure [meter]')
-    plt.savefig('.\image\df2\Familiarization_df2_PressureNodes_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
+
 
 # %%
 
@@ -390,8 +384,7 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.3, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Flowrate [L/s]')
-    plt.savefig('.\image\df2\Familiarization_df2_Flowrate_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
+
 
 # %%
 
@@ -403,8 +396,6 @@ for hr in time_scale:
     plt.legend(loc = 'right', bbox_to_anchor=(1.3, 0.5))
     plt.xlabel('Hour')
     plt.ylabel('Setting (dmnl)')
-    plt.savefig('.\image\df2\Familiarization_df2_Setting_%ihr.png' % hr, 
-                bbox_inches = 'tight', facecolor = 'w')
 
 # %% [markdown]
 
