@@ -61,7 +61,8 @@ class ARMA_detection:
                 id_max = np.where(residual_in_step == np.amax(residual_in_step))[0]
                 dateAnomaly = self.test.index[t*stepsize + id_max][0]
                 self.anomalies += [dateAnomaly]
-                print('Anomaly detected at %s : real = %0.2f, predict = %0.2f' % (dateAnomaly, vReal[id_max], vPred[id_max]))
+                print('Anomaly detected at %s : real = %0.2f,\tpredict = %0.2f,\tresidual = %0.2f' % 
+                      (dateAnomaly, vReal[id_max], vPred[id_max], abs(vReal[id_max]-vPred[id_max])))
             # book keeping
             self.predictions += vPred[:len(vReal)].tolist()
             history += vReal.tolist()
