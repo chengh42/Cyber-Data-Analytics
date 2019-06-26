@@ -14,5 +14,16 @@ The scripts for this assignment include:
 - Task 4. Profiling
 - Task 5. Classification
 
-Reference: "An empirical comparison of botnet detection methods" Sebastian Garcia, Martin Grill, Jan Stiborek and Alejandro Zunino. 
+## Data
+
+The CTU-13 dataset of botnet traffic is retrieved from https://www.stratosphereips.org/datasets-ctu13.
+
+More specifically, in this assignment, datasets of two botnet scenarios are used for the analysis:
+
+- Scenario 2 (CTU-Malware-Capture-Botnet-43)
+- Scenario 10 (CTU-Malware-Capture-Botnet-51)
+
+## Reference
+
+"An empirical comparison of botnet detection methods" Sebastian Garcia, Martin Grill, Jan Stiborek and Alejandro Zunino. 
 Computers and Security Journal, Elsevier. 2014. Vol 45, pp 100-123. http://dx.doi.org/10.1016/j.cose.2014.05.011
